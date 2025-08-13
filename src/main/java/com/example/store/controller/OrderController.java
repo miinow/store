@@ -27,6 +27,11 @@ public class OrderController {
         return orderService.getAllOrders(pageable);
     }
 
+    @GetMapping("/{id}")
+    public OrderDTO getOrderByID(@PathVariable Long id) {
+        return orderService.getOrderByID(id);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public OrderDTO createOrder(@RequestBody Order order) {
