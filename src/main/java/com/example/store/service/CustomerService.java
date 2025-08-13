@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
@@ -26,7 +28,8 @@ public class CustomerService {
         return customers.map(customerMapper::customerToCustomerDTO);
     }
 
-    public CustomerDTO createCustomer(Customer customer) {
+    public CustomerDTO createCustomer(String name) {
+        Customer customer = Customer.builder().name(name).orders(List.of()).build();
         return customerMapper.customerToCustomerDTO(customerRepository.save(customer));
     }
 }

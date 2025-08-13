@@ -12,3 +12,10 @@ databaseChangeLog:
         - sql:
             sql: |
               SELECT setval('order_id_seq', (SELECT COALESCE(MAX(id), 1) FROM "order"));
+  - changeSet:
+      id: fix-customer-sequence
+      author: nicolas.zhou
+      changes:
+        - sql:
+            sql: |
+              SELECT setval('customer_id_seq', (SELECT COALESCE(MAX(id), 1) FROM customer));
