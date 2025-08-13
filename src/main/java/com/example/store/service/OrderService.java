@@ -10,6 +10,8 @@ import com.example.store.repository.CustomerRepository;
 import com.example.store.repository.OrderRepository;
 import com.example.store.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -31,11 +33,14 @@ public class OrderService {
     private final ProductRepository productRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "ordersPage",
+            key = "'p=' + #pageable.pageNumber + '|' + 's=' + #pageable.pageSize + '|' + 'sort=' + #pageable.sort")
     public Page<OrderDTO> getAllOrders(Pageable pageable) {
         Page<Order> orders = orderRepository.findAll(pageable);
         return orders.map(orderMapper::orderToOrderDTO);
     }
 
+    @CacheEvict(cacheNames = "ordersPage", allEntries = true)
     public OrderDTO createOrder(CreateOrderRequest request) {
         Customer customer = customerRepository.findById(request.customerId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found Customer by ID " + request.customerId()));
@@ -58,6 +63,7 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "orderById", key = "#id")
     public OrderDTO getOrderByID(Long id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found Order by ID " + id));
