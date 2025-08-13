@@ -22,9 +22,10 @@ public class CustomerController {
 
     @GetMapping
     public Page<CustomerDTO> getAllCustomers(
+            @RequestParam(value="name", required = false) String name,
             @PageableDefault(size = 50, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return customerService.getAllCustomers(pageable);
+        return customerService.getAllCustomers(name, pageable);
     }
 
     @PostMapping
