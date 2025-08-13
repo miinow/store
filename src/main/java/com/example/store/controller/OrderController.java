@@ -1,9 +1,9 @@
 package com.example.store.controller;
 
 import com.example.store.dto.OrderDTO;
-import com.example.store.entity.Order;
-
+import com.example.store.dto.request.CreateOrderRequest;
 import com.example.store.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -34,7 +34,7 @@ public class OrderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public OrderDTO createOrder(@RequestBody Order order) {
-        return orderService.createOrder(order);
+    public OrderDTO createOrder(@RequestBody @Valid CreateOrderRequest request) {
+        return orderService.createOrder(request);
     }
 }

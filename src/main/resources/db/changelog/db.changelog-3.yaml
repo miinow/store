@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: 3-product-tables
-      author: nicolaszhou28@gmail.com
+      author: nicolas.zhou
       changes:
         - sqlFile:
             path: db/changelog/product-tables.sql

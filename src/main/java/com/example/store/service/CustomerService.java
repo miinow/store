@@ -20,7 +20,7 @@ public class CustomerService {
 
     @Transactional(readOnly = true)
     public Page<CustomerDTO> getAllCustomers(String name, Pageable pageable) {
-        String trimmedName = name.trim();
+        String trimmedName = name != null? name.trim(): null;
         Page<Customer> customers = StringUtils.isBlank(trimmedName) ?
                 customerRepository.findAll(pageable) : customerRepository.findByNameContainingIgnoreCase(trimmedName, pageable);
         return customers.map(customerMapper::customerToCustomerDTO);
