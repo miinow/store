@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3-product-tables
+      author: nicolaszhou28@gmail.com
+      changes:
+        - sqlFile:
+            path: db/changelog/product-tables.sql
