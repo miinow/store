@@ -5,17 +5,4 @@ databaseChangeLog:
       file: db/changelog/db.changelog-2.yaml
   - include:
       file: db/changelog/db.changelog-3.yaml
-  - changeSet:
-      id: fix-order-sequence
-      author: nicolas.zhou
-      changes:
-        - sql:
-            sql: |
-              SELECT setval('order_id_seq', (SELECT COALESCE(MAX(id), 1) FROM "order"));
-  - changeSet:
-      id: fix-customer-sequence
-      author: nicolas.zhou
-      changes:
-        - sql:
-            sql: |
-              SELECT setval('customer_id_seq', (SELECT COALESCE(MAX(id), 1) FROM customer));
+

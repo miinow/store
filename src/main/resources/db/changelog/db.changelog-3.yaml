@@ -5,3 +5,23 @@ databaseChangeLog:
       changes:
         - sqlFile:
             path: db/changelog/product-tables.sql
+  - changeSet:
+      id: 4-fix-order-sequence
+      author: nicolas.zhou
+      changes:
+        - sql:
+            sql: |
+              SELECT setval('order_id_seq', (SELECT COALESCE(MAX(id), 1) FROM "order"));
+  - changeSet:
+      id: 5-fix-customer-sequence
+      author: nicolas.zhou
+      changes:
+        - sql:
+            sql: |
+              SELECT setval('customer_id_seq', (SELECT COALESCE(MAX(id), 1) FROM customer));
+  - changeSet:
+      id: 6-create-indexes
+      author: nicolas.zhou
+      changes:
+        - sqlFile:
+            path: db/changelog/index.sql
