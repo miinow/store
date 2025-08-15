@@ -5,10 +5,43 @@ plugins {
     id 'org.liquibase.gradle' version '2.2.0'
     id 'com.diffplug.spotless' version '6.25.0'
     id 'jacoco'
+    id 'pl.allegro.tech.build.axion-release' version '1.18.14'
 }
 
 group = 'com.example'
-version = '1.0.0-SNAPSHOT'
+
+scmVersion {
+    tag {
+        prefix = ''
+    }
+    hooks {
+        // Before tagging: set gradle.properties to the release version and commit
+        pre 'fileUpdate', [
+            files: ['gradle.properties'],
+            pattern: { v, p -> /(?m)^version=.*/ },
+            replacement: { v, p -> "version=${v}" }
+        ]
+        pre 'commit'
+        
+        // After tagging: bump to next patch -SNAPSHOT and commit
+        post 'fileUpdate', [
+            files: ['gradle.properties'],
+            pattern: { v, p -> /(?m)^version=.*/ },
+            replacement: { v, p ->
+                def m = (v =~ /(\d+)\.(\d+)\.(\d+)/)
+                if (!m.matches()) throw new GradleException("Unsupported version format for bumping: ${v}")
+                int major = m[0][1] as int
+                int minor = m[0][2] as int
+                int patch = m[0][3] as int
+                return "version=${major}.${minor}.${patch + 1}-SNAPSHOT"
+            }
+        ]
+        post 'commit'
+        // Note: push hooks can be added if CI has push permissions
+    }
+}
+
+version = scmVersion.version
 
 java {
     toolchain {
@@ -62,16 +95,41 @@ tasks.named('test') {
     finalizedBy tasks.jacocoTestReport
 }
 
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+def jacocoExcludes = ['**/mapper/**', '**/StoreApplication.class']
+
 tasks.jacocoTestReport {
     dependsOn tasks.test // Ensure tests run before generating the report
 
     reports {
         html.required.set(true)
     }
-    afterEvaluate {
-        classDirectories = files(classDirectories.files.collect {
-            fileTree(dir: it,
-                    exclude: ['**/mapper/**', '**/StoreApplication.class'])
-        })
-    }
+
+    // Use explicit class directories with provider-based layout API 
+    def mainJavaClasses = fileTree(dir: layout.buildDirectory.dir("classes/java/main").get().asFile, exclude: jacocoExcludes)
+    classDirectories.setFrom(mainJavaClasses)
 }
+
+// Enforce minimum coverage threshold globally
+tasks.named('jacocoTestCoverageVerification', JacocoCoverageVerification).configure {
+    dependsOn tasks.test
+    violationRules {
+        rule {
+            enabled = true
+            // Evaluate overall line coverage ratio
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.80
+            }
+        }
+    }
+    // Apply same exclusions as the report, so the gate evaluates the same code set
+    def mainJavaClasses = fileTree(dir: layout.buildDirectory.dir("classes/java/main").get().asFile, exclude: jacocoExcludes)
+    classDirectories.setFrom(mainJavaClasses)
+}
+
+tasks.check.dependsOn tasks.jacocoTestCoverageVerification

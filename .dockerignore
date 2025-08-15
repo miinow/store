@@ -1,0 +1,22 @@
+# General
+.git
+.gitignore
+.gradle
+**/.DS_Store
+**/*.iml
+.idea/
+
+# Build outputs
+build/
+!build/libs/*.jar
+out/
+!gradle/wrapper/
+
+# Node utils (not needed for app runtime image)
+utils/node_modules/
+utils/.npm/
+
+# Test and reports
+**/test-results/
+**/reports/
+**/jacoco/
