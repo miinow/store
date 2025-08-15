@@ -1,8 +1,10 @@
 spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
   datasource:
-    url: jdbc:postgresql://localhost:5433/store
-    username: admin
-    password: admin
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/store}
+    username: ${DB_USERNAME:admin}
+    password: ${DB_PASSWORD:admin}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -18,3 +20,43 @@ spring:
     cache-names: orderById, productById, customersPage, ordersPage, productPage
     caffeine:
       spec: maximumSize=10000,expireAfterWrite=60s,recordStats
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  jpa:
+    show-sql: true
+  cache:
+    type: none
+logging:
+  level:
+    org.hibernate.SQL: info
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+---
+spring:
+  config:
+    activate:
+      on-profile: qa
+  jpa:
+    show-sql: false
+  cache:
+    type: caffeine
+logging:
+  level:
+    org.hibernate.SQL: info
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  jpa:
+    show-sql: false
+  cache:
+    type: caffeine
+logging:
+  level:
+    org.hibernate.SQL: warn
