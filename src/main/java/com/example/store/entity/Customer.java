@@ -26,5 +26,6 @@ public class Customer {
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @BatchSize(size = 50)
+    @Builder.Default
     private List<Order> orders = new ArrayList<>();
 }

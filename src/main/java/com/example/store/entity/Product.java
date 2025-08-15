@@ -23,5 +23,6 @@ public class Product {
     private String description;
 
     @ManyToMany(mappedBy = "products")
+    @Builder.Default
     private List<Order> orders = new ArrayList<>();
 }

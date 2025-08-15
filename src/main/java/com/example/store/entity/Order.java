@@ -36,5 +36,6 @@ public class Order {
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
     @BatchSize(size = 50)
+    @Builder.Default
     private List<Product> products = new ArrayList<>();
 }
